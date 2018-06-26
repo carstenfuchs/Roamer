@@ -11,19 +11,23 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from Roamer import localconfig
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+HUSQVARNA_USERNAME = localconfig.HUSQVARNA_USERNAME
+HUSQVARNA_PASSWORD = localconfig.HUSQVARNA_PASSWORD
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '^3njkqn6h&quxbfa$kvl2e4x3%&gl9qc5pi@@dr9o#c49fr91&'
+SECRET_KEY = localconfig.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = localconfig.DEBUG
 
 ALLOWED_HOSTS = []
 
@@ -37,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'HusqAM',
 ]
 
 MIDDLEWARE = [
