@@ -17,7 +17,7 @@ class Robot(models.Model):
         changed = []
 
         for (model_fieldname, dict_key) in (("manufac_model", "model"), ("given_name", "name")):
-            if getattr(self, model_fieldname) != d[dict_key]:
+            if dict_key in d and getattr(self, model_fieldname) != d[dict_key]:
                 setattr(self, model_fieldname, d[dict_key])
                 changed.append(model_fieldname)
 
