@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
+<head>
+    <title>{% block title %}{{ title|default:"Willkommen" }}{% endblock %} | Roamer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="NONE,NOARCHIVE">
+
+    <link rel="icon" type="image/png" href="{% static 'common/images/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'common/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'common/bootstrap-submenu/css/bootstrap-submenu.min.css' %}">
+    {% block theme %}<link rel="stylesheet" href="{% static 'common/bootstrap/css/bootstrap-theme.min.css' %}">{% endblock %}
+    <style>
+        /* Behebe das Problem, dass die Breite eines Submenüs nicht mitwächst, wenn ein Menüpunkt */
+        /* aus langem Text besteht; vgl. https://github.com/vsn4ik/bootstrap-submenu/issues/22    */
+        .navbar-right .dropdown-submenu .dropdown-menu {
+            right: auto;
+        }
+
+        /* Bootstrap bewirkt, dass beim Drucken eines Links dessen Ziel (href="...") mit ausgegeben wird, vgl. */
+        /*   - http://makandracards.com/makandra/29149-bootstrap-how-to-avoid-printing-link-urls               */
+        /*   - http://stackoverflow.com/questions/23022795/bootstrap-3-1-1-page-hide-the-url-of-links          */
+        /* Das funktioniert nicht gut für uns und wird deshalb hier rückgängig gemacht.                        */
+        @media print {
+            a[href]:after {
+                content: none !important;
+            }
+        }
+
+        /* Vgl. https://github.com/twbs/bootstrap/issues/16574 bzw. https://github.com/necolas/normalize.css/commit/5304c78       */
+        /* Mit Bootstrap 4+ wird eine aktuelle Version von normalize.css mitgeliefert, dann wird dieser Teil nicht mehr benötigt. */
+        /**
+         * Address inconsistent styling of `abbr[title]`.
+         * 1. Correct styling in Firefox 39 and Opera 12.
+         * 2. Correct missing styling in Chrome, Edge, IE, Opera, and Safari.
+         */
+        abbr[title] {
+            border-bottom: none; /* 1 */
+            text-decoration: underline; /* 2 */
+            text-decoration: underline dotted; /* 2 */
+        }
+    </style>
+    {% block extrastyle %}{% endblock %}
+    {% block extrahead %}{% endblock %}
+</head>
+
+<body>  {# class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}" #}
+    <nav class="navbar navbar-default navbar-static-top">
+        <div class="{% block navbar-class %}container-fluid{% endblock %}">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{% url 'husqam:load-json' %}">{% block branding %}Roamer{% endblock %}</a>
+            </div>
+        </div>
+    </nav>
+
+    {% block messages %}
+        {% if messages %}
+            <div class="container">
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    {{ message|capfirst }}
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endblock %}
+
+    {% block breadcrumbs %}{% endblock %}
+
+    {% block content %}
+        {{ content }}
+    {% endblock %}
+
+    {% block footer %}{% endblock %}
+
+    <script src="{% static 'common/jquery.min.js' %}"></script>
+    <script src="{% static 'common/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'common/bootstrap-submenu/js/bootstrap-submenu.min.js' %}"></script>
+    <script>
+        $('[data-submenu]').submenupicker();
+    </script>
+    {% block extrascript %}{% endblock %}
+</body>
+</html>

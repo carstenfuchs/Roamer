@@ -59,15 +59,30 @@ ROOT_URLCONF = 'Roamer.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [
+            # Paths must be absolute and always use forward slashes, even on Windows.
+            os.path.join(BASE_DIR, 'templates'),
+        ],
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.request',
+                'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'loaders': [
+                # List of callables that know how to load templates from various sources.
+                ('django.template.loaders.cached.Loader', (
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                    # 'django.template.loaders.eggs.Loader',
+                )),
+            ],
+            # 'string_if_invalid': 'DEBUG WARNING: template variable "%s" is undefined',
         },
     },
 ]
