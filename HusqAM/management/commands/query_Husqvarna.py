@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import json, pyhusmow
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from HusqAM.models import Robot
+from HusqAM.models import Robot, Status
 
 
 class Command(BaseCommand):
@@ -41,9 +41,21 @@ class Command(BaseCommand):
             for robot_dict in mow.list_robots():
                 robot = Robot.objects.get(manufac_id=robot_dict['id'])
                 changes = robot.update_from_dict(robot_dict)
-                robot.save()
-                self.stdout.write(str(robot) + " – ", ending="")
-                self.stdout.write(", ".join(changes) if changes else "keine Änderungen")
+
+                if changes:
+                    robot.save()
+                    self.stdout.write("{} – changes: {}".format(robot, ", ".join(changes)))
+                else:
+                    self.stdout.write("{} – no changes to robot details.".format(robot))
+
+                st = Status(robot=robot)
+                st.update_from_dict(robot_dict["status"])
+
+                if st.should_save():
+                    st.save()
+                    self.stdout.write("{} – state changed, saved.".format(robot))
+                else:
+                    self.stdout.write("{} – no changes to robot state.".format(robot))
 
         if options['post_to_remote']:
             pass
