@@ -39,7 +39,7 @@ class Status(models.Model):
     lastErrorTimestamp = models.DateTimeField(null=True, blank=True)
     mowerStatus        = models.CharField(max_length=80)
     nextStartSource    = models.CharField(max_length=80)
-    nextStartTimestamp = models.DateTimeField()
+    nextStartTimestamp = models.DateTimeField(null=True, blank=True)
     operatingMode      = models.CharField(max_length=40)    # always "AUTO"
     storedTimestamp    = models.DateTimeField()
     showAsDisconnected = models.BooleanField()      # always False
