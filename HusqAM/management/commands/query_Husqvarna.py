@@ -3,6 +3,7 @@ import json, pyhusmow
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from HusqAM.models import Robot, Status
+from HusqAM.utils import process_pyhusmow_dict
 
 
 class Command(BaseCommand):
@@ -41,22 +42,10 @@ class Command(BaseCommand):
         if options['update_database']:
             for robot_dict in mow.list_robots():
                 robot = Robot.objects.get(manufac_id=robot_dict['id'])
-                changes = robot.update_from_dict(robot_dict)
+                robot_changes, new_state = process_pyhusmow_dict(robot, robot_dict)
 
-                if changes:
-                    robot.save()
-                    self.stdout.write("{} – changes: {}".format(robot, ", ".join(changes)))
-                else:
-                    self.stdout.write("{} – no changes to robot details.".format(robot))
-
-                st = Status(robot=robot)
-                st.update_from_dict(robot_dict["status"])
-
-                if st.should_save():
-                    st.save()
-                    self.stdout.write("{} – state changed, saved.".format(robot))
-                else:
-                    self.stdout.write("{} – no changes to robot state.".format(robot))
+                self.stdout.write("{} – robot changes: {}".format(robot, ", ".join(robot_changes) or "none"))
+                self.stdout.write("{} – state changed: {}".format(robot, new_state.mowerStatus if new_state else "no"))
 
         if options['post_to_remote']:
             pass
