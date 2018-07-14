@@ -1,11 +1,14 @@
 import json
+from django import forms
 from django.contrib import messages
 from django.contrib.auth import authenticate
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
-from django import forms
+from django.views.decorators.csrf import csrf_exempt
+
 from HusqAM.models import Robot
+from HusqAM.utils import process_pyhusmow_dict
 
 
 class LoadJsonForm(forms.Form):
@@ -27,51 +30,56 @@ class LoadJsonForm(forms.Form):
         try:
             cd['robot_dicts'] = json.loads(cd['json'])
         except json.JSONDecodeError as de:
-            raise forms.ValidationError(de)
+            self.add_error("json", de)
+            return cd
 
         if isinstance(cd['robot_dicts'], dict):
             cd['robot_dicts'] = [cd['robot_dicts']]
 
         if not isinstance(cd['robot_dicts'], list):
             self.add_error("json", "Input must be an object or array of objects.")
+            return cd
 
         return cd
 
 
-# @login_required
+@csrf_exempt
 def load_json(request):
-    if request.method == 'POST':
-        # Es wurden Formular-Daten übermittelt - erzeuge eine Form die an die POST Daten "gebunden" (bound) ist.
-        form = LoadJsonForm(request.POST)
-
-        if form.is_valid():
-            cd =  form.cleaned_data
-            num_robots = 0
-
-            for robot_dict in cd['robot_dicts']:
-                try:
-                    robot = Robot.objects.get(owner=cd['user'], manufac_id=robot_dict.get('id'))
-                except Robot.DoesNotExist:
-                    continue
-
-                changes = robot.update_from_dict(robot_dict)
-                num_robots += 1
-
-                if changes:
-                    robot.save()
-                    messages.success(request, "{} has been updated ({}).".format(robot, ", ".join(changes)))
-                else:
-                    messages.info(request, "There were no changes for {}.".format(robot))
-
-            if num_robots == 0:
-                messages.warning(request, "The input did not contain data for any of {}'s robots.".format(cd['user']))
-
-            # Redirect after POST, so that the request isn't repeated when the user hits "Refresh".
-            return HttpResponseRedirect(reverse("husqam:load-json"))
-
-    else:
-        # Es wurden keine Formular-Daten übermittelt - lege eine neue "unbound" Form mit Initialwerten an.
+    if request.method != 'POST':
+        # It's a GET request – not our intended use case, except for debugging.
         form = LoadJsonForm()
+        return render(request, 'HusqAM/LoadJSON.html', {'form': form})
 
-    # Fertig! Ergebnisse an Template zum Rendern übergeben.
-    return render(request, 'HusqAM/LoadJSON.html', {'form': form})
+    # It's a POST request, create a form with "bound" data.
+    form = LoadJsonForm(request.POST)
+
+    if not form.is_valid():
+        # There were errors in the form data.
+        return HttpResponse(
+            "There were errors in the form data:\n" + json.dumps(form.errors, indent=4),
+            content_type="text/plain; charset=utf-8"
+        )
+
+    # It's a POST request and the form data is valid.
+    cd =  form.cleaned_data
+    result = []
+
+    for robot_dict in cd['robot_dicts']:
+        try:
+            robot = Robot.objects.get(owner=cd['user'], manufac_id=robot_dict.get('id'))
+        except Robot.DoesNotExist:
+            result.append("{} doesn't exist or is not assigned to user {}.", robot, cd['user'])
+            continue
+
+        robot_changes, new_state = process_pyhusmow_dict(robot, robot_dict)
+
+        result.append("{} – robot changes: {}".format(robot, ", ".join(robot_changes) or "none"))
+        result.append("{} – state changed: {}".format(robot, new_state.mowerStatus if new_state else "no"))
+
+    if not result:
+        result.append("The input did not contain any data.")
+
+    # Normally we would redirect after a POST request, so that the request isn't repeated
+    # when the user hits "Refresh" in the browser. However, this view is not intended to
+    # be loaded in a browser, so we send a straight reply with the result instead.
+    return HttpResponse("\n".join(result), content_type="text/plain; charset=utf-8")
