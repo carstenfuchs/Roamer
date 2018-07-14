@@ -28,14 +28,15 @@ class Command(BaseCommand):
             tc.save_config()
             self.stdout.write('Created a new token.')
 
-        for robot_dict in mow.list_robots():
-            self.stdout.write(json.dumps(robot_dict, indent=4))
-            self.stdout.write("\n")
+        if True:    # local console output
+            for robot_dict in mow.list_robots():
+                self.stdout.write(json.dumps(robot_dict, indent=4))
+                self.stdout.write("\n")
 
-            # mow.select_robot(robot['id'])
-            # s = pprint.pformat(mow.status(), indent=4)
-            # self.stdout.write(s)
-            # self.stdout.write("\n")
+                # mow.select_robot(robot['id'])
+                # s = pprint.pformat(mow.status(), indent=4)
+                # self.stdout.write(s)
+                # self.stdout.write("\n")
 
         if options['update_database']:
             for robot_dict in mow.list_robots():
