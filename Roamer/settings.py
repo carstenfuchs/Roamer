@@ -19,6 +19,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HUSQVARNA_USERNAME = localconfig.HUSQVARNA_USERNAME
 HUSQVARNA_PASSWORD = localconfig.HUSQVARNA_PASSWORD
 
+QUERY_HUSQVARNA_POST_REMOTE_SERVER_USERNAME = localconfig.QUERY_HUSQVARNA_POST_REMOTE_SERVER_USERNAME
+QUERY_HUSQVARNA_POST_REMOTE_SERVER_PASSWORD = localconfig.QUERY_HUSQVARNA_POST_REMOTE_SERVER_PASSWORD
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
