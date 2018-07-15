@@ -41,7 +41,12 @@ class Command(BaseCommand):
 
         if options['update_database']:
             for robot_dict in mow.list_robots():
-                robot = Robot.objects.get(manufac_id=robot_dict['id'])
+                try:
+                    robot = Robot.objects.get(manufac_id=robot_dict['id'])
+                except Robot.DoesNotExist:
+                    self.stderr.write('The robot with ID "{}" does not exist.\nUse the `add_robot` command to add it.'.format(robot_dict['id']))
+                    continue
+
                 robot_changes, new_state = process_pyhusmow_dict(robot, robot_dict)
 
                 self.stdout.write("{} – robot changes: {}".format(robot, ", ".join(robot_changes) or "none"))

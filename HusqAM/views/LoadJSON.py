@@ -65,15 +65,14 @@ def load_json(request):
     result = []
 
     for robot_dict in cd['robot_dicts']:
-        try:
-            robot = Robot.objects.get(owner=cd['user'], manufac_id=robot_dict.get('id'))
-        except Robot.DoesNotExist:
-            result.append("{} doesn't exist or is not assigned to user {}.", robot, cd['user'])
+        if not robot_dict.get('id'):
+            # Silently ignore this problem.
             continue
 
+        robot, created = Robot.objects.get_or_create(owner=cd['user'], manufac_id=robot_dict['id'])
         robot_changes, new_state = process_pyhusmow_dict(robot, robot_dict)
 
-        result.append("{} – robot changes: {}".format(robot, ", ".join(robot_changes) or "none"))
+        result.append("{} – robot changes: {}{}".format(robot, "created new instance, " if created else "", ", ".join(robot_changes) or "none"))
         result.append("{} – state changed: {}".format(robot, new_state.mowerStatus if new_state else "no"))
 
     if not result:
