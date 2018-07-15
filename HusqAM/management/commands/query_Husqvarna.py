@@ -29,7 +29,7 @@ class Command(BaseCommand):
             tc.save_config()
             self.stdout.write('Created a new token.')
 
-        if True:    # local console output
+        if options['verbosity'] > 0:    # local console output
             for robot_dict in mow.list_robots():
                 self.stdout.write(json.dumps(robot_dict, indent=4))
                 self.stdout.write("\n")
