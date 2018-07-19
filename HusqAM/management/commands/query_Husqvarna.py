@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-import json, pyhusmow, requests
+import copy, json, os, pyhusmow, requests, time
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
@@ -15,6 +15,7 @@ class Command(BaseCommand):
         parser.add_argument('username', help='The user whose Husqvarna account should be queried.')
         parser.add_argument('-u', '--update-database', action='store_true', help='Aktualisiert die lokale Datenbank mit den abgerufenen Informationen.')
         parser.add_argument('-p', '--post-to-remote', metavar='URL', help='Sendet die abgerufenen Informationen per POST Request an den entfernten Server.')
+        parser.add_argument('-l', '--local-shortcut', action='store_true', help='Skips -p and -u if a local file cache indicates that the data has not changed.')
 
     def get_list_robots(self, user, mowAPI):
         for connection_attempt in (1, 2, 3):
@@ -46,6 +47,26 @@ class Command(BaseCommand):
                 # s = pprint.pformat(mow.status(), indent=4)
                 # self.stdout.write(s)
                 # self.stdout.write("\n")
+
+        if options['local_shortcut']:
+            tmp_name = os.path.join(settings.BASE_DIR, ".hus_query_cache")
+            copy_list_robots = copy.deepcopy(list_robots)
+
+            # Some values change too fast to be useful.
+            for robot_dict in copy_list_robots:
+                robot_dict['status']['batteryPercent'] = 0
+                robot_dict['status']['storedTimestamp'] = 0
+
+            dump = json.dumps(copy_list_robots, indent=4) + "\n"
+
+            if os.path.exists(tmp_name) and (time.time() - os.path.getmtime(tmp_name)) < 600.0:
+                with open(tmp_name) as f:
+                    if f.read() == dump:
+                        self.stdout.write("The local file cache indicates that the data has not changed. Quit.")
+                        return
+
+            with open(tmp_name, 'w') as f:
+                f.write(dump)
 
         if options['update_database']:
             for robot_dict in list_robots:

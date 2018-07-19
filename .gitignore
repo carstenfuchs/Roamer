@@ -1,3 +1,4 @@
 *.pyc
+.hus_query_cache
 db.sqlite3
 Roamer/localconfig.py
