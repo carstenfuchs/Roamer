@@ -3,10 +3,6 @@
 
 DEBUG = False
 
-# Kontodaten zum Login bei den Husqvarna-Servern.
-HUSQVARNA_USERNAME = ""
-HUSQVARNA_PASSWORD = ""
-
 # Trage hier niemals Dummy-Daten ein!
 # Lori würde versuchen, die Verbindung tatsächlich herzustellen, z.B. um nach
 # einem Programmfehler einen Bericht zu versenden. Da keine Antwort eintrifft

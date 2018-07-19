@@ -1,6 +1,40 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
+
+
+class HusAccount(models.Model):
+    """
+    This class represents one "Connect" account at Husqvarna.
+    Each such account is normally owned by exactly one individual person,
+    so that we associate it with exactly one of our User accounts.
+    Querying one Husqvarna account returns information about all robots that
+    are paired with it, however note that one robot can be paired to multiple
+    accounts: Querying two accounts can return updates about a common robot.
+    """
+    user           = models.OneToOneField(User, primary_key=True)
+    hus_login      = models.CharField(max_length=60)
+    hus_password   = models.CharField(max_length=60)
+    token_id       = models.CharField(max_length=60, blank=True)
+    token_provider = models.CharField(max_length=60, blank=True)
+    token_expires  = models.DateTimeField(null=True, blank=True)
+
+    def update_connection(self, mowAPI, force_new_token=False):
+        if force_new_token:
+            self.token_id = ""
+
+        if self.token_id and self.token_provider and self.token_expires and timezone.now() < self.token_expires:
+            mowAPI.set_token(self.token_id, self.token_provider)
+            return False
+
+        expires = mowAPI.login(self.hus_login, self.hus_password)
+
+        self.token_id = mowAPI.token
+        self.token_provider = mowAPI.provider
+        self.token_expires = timezone.now() + timedelta(0, expires)
+        self.save()
+        return True
 
 
 class Robot(models.Model):

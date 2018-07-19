@@ -16,9 +16,6 @@ from Roamer import localconfig
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-HUSQVARNA_USERNAME = localconfig.HUSQVARNA_USERNAME
-HUSQVARNA_PASSWORD = localconfig.HUSQVARNA_PASSWORD
-
 QUERY_HUSQVARNA_POST_REMOTE_SERVER_USERNAME = localconfig.QUERY_HUSQVARNA_POST_REMOTE_SERVER_USERNAME
 QUERY_HUSQVARNA_POST_REMOTE_SERVER_PASSWORD = localconfig.QUERY_HUSQVARNA_POST_REMOTE_SERVER_PASSWORD
 
