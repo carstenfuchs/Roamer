@@ -57,7 +57,7 @@ class Command(BaseCommand):
                 robot_dict['status']['batteryPercent'] = 0
                 robot_dict['status']['storedTimestamp'] = 0
 
-            dump = json.dumps(copy_list_robots, indent=4) + "\n"
+            dump = json.dumps(copy_list_robots, indent=4, sort_keys=True) + "\n"
 
             if os.path.exists(tmp_name) and (time.time() - os.path.getmtime(tmp_name)) < 600.0:
                 with open(tmp_name) as f:
