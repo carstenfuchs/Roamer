@@ -40,7 +40,7 @@ class Command(BaseCommand):
 
         if options['verbosity'] > 0:    # local console output
             for robot_dict in list_robots:
-                self.stdout.write(json.dumps(robot_dict, indent=4))
+                self.stdout.write(json.dumps(robot_dict, indent=4, sort_keys=True))
                 self.stdout.write("\n")
 
                 # mow.select_robot(robot['id'])
@@ -85,7 +85,7 @@ class Command(BaseCommand):
             payload = {
                 'username': settings.QUERY_HUSQVARNA_POST_REMOTE_SERVER_USERNAME,
                 'password': settings.QUERY_HUSQVARNA_POST_REMOTE_SERVER_PASSWORD,
-                'json': json.dumps(list_robots, indent=4),
+                'json': json.dumps(list_robots, indent=4, sort_keys=True),
             }
 
             r = requests.post(options['post_to_remote'], data=payload)
