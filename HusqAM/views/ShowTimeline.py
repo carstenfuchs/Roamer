@@ -1,57 +1,62 @@
-import json
-from calendar import timegm
-from datetime import datetime
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from HusqAM.models import Robot, Status
+
+
+# mowerStatesList = (
+#     "OK_LEAVING", "OK_CUTTING", "OK_CUTTING_NOT_AUTO", "OK_SEARCHING", "OK_CHARGING",
+#     "PAUSED", "PARKED_TIMER", "PARKED_PARKED_SELECTED",
+#     "OFF_HATCH_OPEN", "OFF_HATCH_CLOSED",
+#     "??? UNKNOWN",
+# )
+
+
+class Day:
+    def __init__(self):
+        self.states = []
 
 
 @login_required
 def Daily(request, robot_id):
     robot = get_object_or_404(Robot, id=robot_id)
-    series = {}
-    problems = []
+    all_states = robot.status_set.all()
 
-    mowerStatesList = (
-        "OK_LEAVING", "OK_CUTTING", "OK_CUTTING_NOT_AUTO", "OK_SEARCHING", "OK_CHARGING",
-        "PAUSED", "PARKED_TIMER", "PARKED_PARKED_SELECTED",
-        "OFF_HATCH_OPEN", "OFF_HATCH_CLOSED",
-        "??? UNKNOWN",
+    this_state = Status(
+        robot=robot,
+        timestamp=all_states[0].timestamp.replace(hour=0, minute=0, second=0, microsecond=0),
+        mowerStatus="unknown"
     )
 
-    for mowerStatus in mowerStatesList:
-        series[mowerStatus] = {
-            'name': mowerStatus,
-          # 'color': '',
-            'data': [],
-        }
+    days = []
+    day = Day()
+    day_left = 1440
 
-    for st in robot.status_set.all():
-        # Highcharts nimmt per Voreinstellungen Daten und Zeiten in UTC entgegen, als Millisekunden seit der Unix-Epoche.
+    for next_state in all_states:
+        duration_left = int((next_state.timestamp - this_state.timestamp).total_seconds()) // 60
 
-        # Beachte, dass calendar.timegm() die Inverse von time.gmtime() (nicht von time.mktime()) ist:
-        # http://docs.python.org/library/calendar.html#calendar.timegm
-        # ts = st.timestamp
-        # day = datetime(ts.year, ts.month, ts.day)   # time component is 0:00:00
-        # x = timegm( day.utctimetuple() ) * 1000.0
-        # y = (ts.hour * 3600 + ts.minute * 60) * 1000.0
+        while duration_left:
+            if duration_left <= day_left:
+                day.states.append((duration_left, this_state))
+                day_left -= duration_left
 
-        x = st.timestamp.replace(hour=0, minute=0, second=0, microsecond=0).timestamp() * 1000.0
-        y = st.timestamp.replace(year=1970, month=1, day=1).timestamp() * 1000.0
+                duration_left = 0
+            else:
+                day.states.append((day_left, this_state))
+                duration_left -= day_left
 
-        if st.mowerStatus not in series:
-            problems.append("Unknown mower state „{}“ encountered.".format(st.mowerStatus))
-            st.mowerStatus = "??? UNKNOWN"
+                days.append(day)
+                day = Day()
+                day_left = 1440
 
-        series[st.mowerStatus]['data'].append({
-            'name': st.mowerStatus,
-            'x': x,
-            'y': y,
-        })
+        # prepare the next iteration
+        this_state = next_state
+
+    # add a final span to complete the last day
+    if day_left > 0:
+        day.states.append((day_left, this_state))
+        days.append(day)
 
     return render(request, 'HusqAM/ShowTimelineDaily.html', {
         'robot': robot,
-        'series': json.dumps(list(series.values())),
-        'problems': problems,
+        'days': days,
     })

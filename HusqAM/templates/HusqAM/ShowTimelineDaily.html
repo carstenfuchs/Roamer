@@ -3,109 +3,68 @@
 
 {% block title %}Daily activity for {{ robot }}{% endblock %}
 
-{% block extrascript %}
-    <script src="{% static 'common/Highcharts/js/highcharts.js' %}"></script>
-<!--<script src="{% static 'common/Highcharts/js/themes/grid.js' %}"></script> -->
-    <script src="{% static 'common/Highcharts/js/modules/exporting.js' %}"></script>
+{% block extrastyle %}
+    <style>
+        table.ActivitySequence {
+            margin-bottom: 12px;
+        }
 
-    <script>
-        var chart;
+        table.ActivitySequence tr td {
+            overflow: hidden;
+            white-space: nowrap;
+            border: 1px solid #333;
+            min-height: 8px;
+        }
 
-        $(document).ready(function() {
-            Highcharts.setOptions({
-                lang: {
-                    decimalPoint: ',',
-                    thousandsSep: '.',
-                    downloadJPEG: 'als JPEG Bild herunterladen',
-                    downloadPDF: 'als PDF Dokument herunterladen',
-                    downloadPNG: 'als PNG Bild herunterladen',
-                    downloadSVG: 'als SVG Vektorgrafik herunterladen',
-                    exportButtonTitle: 'Diagramm als Raster- oder Vektorgrafik herunterladen',
-                    printButtonTitle: 'Diagramm ausdrucken',
-                    months: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
-                             'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
-                    resetZoom: 'Zoom zurücksetzen',
-                    resetZoomTitle: 'Zoom auf 1:1 Originalansicht zurücksetzen',
-                    shortMonths: ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
-                    weekdays: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag']
-                }
-            });
+        table.ActivitySequence tr td.unknown {
+            background-color: #999;
+        }
 
-            chart = new Highcharts.Chart({
-                chart: {
-                    ignoreHiddenSeries: false,      // Nicht den sichtbaren (Y-Achsen-)Ausschnitt anpassen, wenn eine Serie ausgeblendet wird.
-                    renderTo: 'GraphContainer',
-                    type: 'scatter',
-                    zoomType: 'x',
-                    resetZoomButton: {
-                        relativeTo: 'chart',
-                        position: { x: -120, y: 10 }
-                    }
-                },
-                exporting: {
-                    filename: 'Daily_Activity',
-                    width: 1600
-                },
-                title: {
-                    text: 'Daily Activity'
-                },
-                subtitle: {
-                    text: '{{ robot }}'
-                },
-                xAxis: {
-                    type: 'datetime',
-                    title: {
-                        // text: 'Datum'
-                    },
-                    minRange:      3 * 24 * 3600 * 1000,      // Kann nicht weiter reinzoomen als "3 Tage".
-                    minTickInterval:   24 * 3600 * 1000,      // Beim Reinzoomen keine Ticks für Stunden anzeigen.
-                    tickColor: '#A0A0A0',
-                    showLastLabel: true,
+        table.ActivitySequence tr td.OK_LEAVING {
+            background-color: #80ffff;
+        }
 
-                    minorTickInterval: 24 * 3600 * 1000,      // Die "kleinen" Ticks für jeden Tag anzeigen.
-                    minorTickColor: '#C0D0E0',
-                    minorTickWidth: 1,
-                    minorTickLength: 3,
-                    minorGridLineWidth: 0
-                },
-                yAxis: {
-                    type: 'datetime',
-                    title: {
-                        text: 'Uhrzeit'
-                    },
-                    tickPixelInterval: 50
-                },
-                tooltip: {
-                    crosshairs: true,
-                    useHTML: true,
-                    formatter: function() {
-                        // if (!this.point.name)   // Kein Tooltip für Öffnungs- und Schließungszeiten anzeigen.
-                        //     return false;
+        table.ActivitySequence tr td.OK_CUTTING {
+            background-color: #80ff80;
+        }
 
-                        return this.series.name + ': ' + Highcharts.dateFormat('%H:%M', this.y)
-                        //return '<a href="{# url 'lori:erfasse-abt' Abt|classname|lower Abt.id #}?Datum=' + Highcharts.dateFormat('%Y-%m-%d', this.x) + '">' +
-                        //    Highcharts.dateFormat('%A, %Y-%m-%d', this.x + this.y) + '</a><br>' +
-                        //    '<span style="color: ' + this.series.color + '; font-weight: bold;">' + this.series.name + ':</span>' +
-                        //        ' <b>' + Highcharts.dateFormat('%H:%M', this.y) + '</b><br>' +
-                        //    (this.point.name ? this.point.name : '');
-                    }
-                },
-                legend: {
-                    // align: 'left',
-                },
-                plotOptions: {
-                    scatter: {
-                        // allowPointSelect: true,     // Punkte dürfen durch Anklicken ausgewählt werden.
-                        turboThreshold: 30000,      // Um alle Punkte eines ganzen Jahres anzeigen zu können.
-                        marker: {
-                            radius: 6,
-                        }
-                    }
-                },
-                series: {{ series|safe }}
-            });
-        });
-    </script>
+        table.ActivitySequence tr td.OK_CUTTING_NOT_AUTO {
+            background-color: #40cc40;
+        }
+
+        table.ActivitySequence tr td.OK_SEARCHING {
+            background-color: #80ffff;
+        }
+
+        table.ActivitySequence tr td.OK_CHARGING {
+            background-color: #ffff80;
+        }
+
+        table.ActivitySequence tr td.PAUSED {
+            background-color: #999;
+        }
+
+        table.ActivitySequence tr td.PARKED_TIMER {
+            background-color: #4040ff;
+            color: white;
+        }
+
+        table.ActivitySequence tr td.PARKED_PARKED_SELECTED {
+            background-color: #0000cc;
+            color: white;
+        }
+
+        table.ActivitySequence tr td.OFF_HATCH_OPEN,
+        table.ActivitySequence tr td.OFF_HATCH_CLOSED {
+            background-color: #ff8080;
+        }
+
+        table.ActivitySequence tr td.ERROR {
+            background-color: #ee0000;
+            color: white;
+        }
+
+    </style>
 {% endblock %}
 
 {% block main-navbar %}
@@ -118,15 +77,25 @@
     <div class="row">
         <div class="col-lg-12">
             <h1>Daily Activity <small>{{ robot }}</small></h1>
-            {% if problems %}
-                <div class="alert alert-danger" role="alert">
-                    {% for p in problems %}
-                        <p>{{ p }}</p>
-                    {% endfor %}
-                </div>
-                {% endif %}
         </div>
     </div>
-    <div id="GraphContainer" style="width: 100%; height: 720px"></div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            {% for day in days %}
+            <table class="ActivitySequence">
+                <tr>
+                    {% for duration, state in day.states %}
+                    <td style="width: {{ duration }}px; max-width: {{ duration }}px;"
+                        title="{{ state.mowerStatus }}"
+                        class="{{ state.mowerStatus }}">
+                        {{ state.mowerStatus }}
+                    </td>
+                    {% endfor %}
+                </tr>
+            </table>
+            {% endfor %}
+        </div>
+    </div>
 </div>
 {% endblock %}
