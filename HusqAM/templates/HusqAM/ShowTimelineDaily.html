@@ -83,13 +83,33 @@
     <div class="row">
         <div class="col-lg-12">
             {% for day in days %}
+                <div class="progress" style="width: 1440px;">{# width ist hier, wenn 100% gewünscht sind, gar nicht notwendig! #}
+                    {% for span in day.spans %}
+                        <div class="progress-bar {{ span.get_css_class }}" role="progressbar"
+                             title="{{ span.state.mowerStatus }} since {{ span.state.timestamp }}, span is {{ span.minutes }} minutes"
+                             style="width: {{ span.minutes }}px;">
+                            {{ span.state.mowerStatus }}
+                            {% if span.state.lastErrorCode %}{{ span.state.lastErrorCode }} at {{ span.state.lastErrorTimestamp }}{% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!--
+    <div class="row">
+        <div class="col-lg-12">
+            <h2>old html</h2>
+            {% for day in days %}
             <table class="ActivitySequence">
                 <tr>
-                    {% for duration, state in day.states %}
-                    <td style="width: {{ duration }}px; max-width: {{ duration }}px;"
-                        title="{{ state.mowerStatus }}"
-                        class="{{ state.mowerStatus }}">
-                        {{ state.mowerStatus }}
+                    {% for span in day.spans %}
+                    <td style="width: {{ span.minutes }}px; max-width: {{ span.minutes }}px;"
+                        title="{{ span.state.mowerStatus }} since {{ span.state.timestamp }}, span is {{ span.minutes }} minutes"
+                        class="{{ span.state.mowerStatus }}">
+                        {{ span.state.mowerStatus }}
+                        {% if span.state.lastErrorCode %}{{ span.state.lastErrorCode }} at {{ span.state.lastErrorTimestamp }}{% endif %}
                     </td>
                     {% endfor %}
                 </tr>
@@ -97,5 +117,6 @@
             {% endfor %}
         </div>
     </div>
+    -->
 </div>
 {% endblock %}
