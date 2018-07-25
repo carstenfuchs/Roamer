@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 from HusqAM.models import Robot, Status
 
 
@@ -26,7 +27,7 @@ class Span:
             "OFF_HATCH_OPEN": "progress-bar-danger",
             "OFF_HATCH_CLOSED": "progress-bar-danger",
 
-            "unknown": "",          # kommt immer am ersten Tag ganz am Anfang vor
+            "unknown": "progress-bar-striped",  # kommt immer am ersten Tag ganz am Anfang vor
             "ERROR": "progress-bar-danger progress-bar-striped",
         }.get(self.state.mowerStatus, "progress-bar-danger")
 
@@ -41,9 +42,14 @@ def Daily(request, robot_id):
     robot = get_object_or_404(Robot, id=robot_id)
     all_states = robot.status_set.all()
 
+    prev_tz = all_states[0].timestamp.tzinfo
+    this_ts = all_states[0].timestamp.astimezone(timezone.get_current_timezone())
+    this_ts = this_ts.replace(hour=0, minute=0, second=0, microsecond=0)
+    this_ts = this_ts.astimezone(prev_tz)   # local midnight, expressed in prev_tz (UTC).
+
     this_state = Status(
         robot=robot,
-        timestamp=all_states[0].timestamp.replace(hour=0, minute=0, second=0, microsecond=0),
+        timestamp=this_ts,
         mowerStatus="unknown"
     )
 
@@ -52,7 +58,14 @@ def Daily(request, robot_id):
     day_left = 1440
 
     for next_state in all_states:
-        duration_left = int((next_state.timestamp - this_state.timestamp).total_seconds()) // 60
+        # Naively, we would write:
+        #   duration_left = int((next_state.timestamp - this_state.timestamp).total_seconds()) // 60
+        # However, this loses time, as both the conversion to `int` and the
+        # integer division cut off the fractional parts. To fix this, the lossy
+        # computations must be done *before* the difference is computed.
+        # (this_ts is an arbitrarily chosen reference. Any other value serves as well.)
+        duration_left = int((next_state.timestamp - this_ts).total_seconds()) // 60 - \
+                        int((this_state.timestamp - this_ts).total_seconds()) // 60
 
         while duration_left:
             if duration_left <= day_left:
