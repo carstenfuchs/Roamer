@@ -16,6 +16,30 @@
     <div class="row">
         <div class="col-md-12">
             <h2>My Robots</h2>
+            {% if user.robot_set.all %}
+                <table id="myRobotsTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Model</th>
+                            <th>Manufacturer ID</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in user.robot_set.all %}
+                        <tr>
+                            <td>{{ r.given_name }}</td>
+                            <td>{{ r.manufac_model }}</td>
+                            <td>{{ r.manufac_id }}</td>
+                            <td><a href="{% url 'husqam:robot-daily' r.id %}">daily activity</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="text-info">At this time, there are no robots in your account.</p>
+            {% endif %}
         </div>
     </div>
     {% endif %}
