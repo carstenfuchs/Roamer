@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
@@ -7,7 +8,7 @@ from HusqAM.models import Robot, Status
 class Span:
     def __init__(self, minutes, state):
         self.minutes = minutes
-        self.percent = minutes / 1440.0
+        self.percent = minutes / 1440.0 * 100.0
         self.state = state
 
     def get_css_class(self):
@@ -23,6 +24,7 @@ class Span:
             "PAUSED": "progress-bar-striped",
             "PARKED_TIMER": "",     # kommt am häufigsten vor
             "PARKED_PARKED_SELECTED": "progress-bar-striped",
+            "PARKED_DAILY_LIMIT": "progress-bar-striped",
 
             "OFF_HATCH_OPEN": "progress-bar-danger",
             "OFF_HATCH_CLOSED": "progress-bar-danger",
@@ -33,7 +35,8 @@ class Span:
 
 
 class Day:
-    def __init__(self):
+    def __init__(self, date_):
+        self.date_ = date_
         self.spans = []
 
 
@@ -54,7 +57,7 @@ def Daily(request, robot_id):
     )
 
     days = []
-    day = Day()
+    day = Day(all_states[0].timestamp.astimezone(timezone.get_current_timezone()).date())
     day_left = 1440
 
     for next_state in all_states:
@@ -78,7 +81,7 @@ def Daily(request, robot_id):
                 duration_left -= day_left
 
                 days.append(day)
-                day = Day()
+                day = Day(day.date_ + timedelta(days=1))
                 day_left = 1440
 
         # prepare the next iteration
