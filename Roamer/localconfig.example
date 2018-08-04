@@ -2,6 +2,7 @@
 # die nicht ins Source Code Repository eingecheckt werden.
 
 DEBUG = False
+ALLOWED_HOSTS = []
 
 # Trage hier niemals Dummy-Daten ein!
 # Lori würde versuchen, die Verbindung tatsächlich herzustellen, z.B. um nach

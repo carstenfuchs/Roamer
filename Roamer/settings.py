@@ -32,7 +32,7 @@ DEBUG = localconfig.DEBUG
 # LOGIN_URL          = localconfig.LOGIN_URL
 LOGIN_REDIRECT_URL = localconfig.LOGIN_REDIRECT_URL   # Ziel nach erfolgreichem Login, falls (mit "next") kein anderes Ziel angegeben wurde.
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = localconfig.ALLOWED_HOSTS
 
 
 # Application definition
