@@ -1,0 +1,33 @@
+{% extends "Basis.html" %}
+{% load staticfiles %}
+
+{% block title %}Start{% endblock %}
+{% block navbar-class %}container-fluid{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 {# text-center #}" style="border-bottom: 2px solid #ccc;">
+            <h1>Roamer</h1>
+        </div>
+    </div>
+
+    {% if user.is_authenticated %}
+    <div class="row">
+        <div class="col-md-12">
+            <h2>My Robots</h2>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Publicly visible robots</h2>
+            {% if public_robots %}
+            {% else %}
+                <p class="text-info">At this time, no robots have been made available for public viewing.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

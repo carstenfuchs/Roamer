@@ -1,14 +1,16 @@
 from django.conf.urls import url
 # from django.contrib.auth import views as auth_views
 # from django.urls import reverse_lazy
-from .views import LoadJSON, ShowTimeline
+from .views import home, LoadJSON, ShowTimeline
 
 
 app_name = 'husqam'
 
 urlpatterns = [
+    url(r'^$', home.handle_request, name='home'),
     url(r'^load-json/$', LoadJSON.load_json, name='load-json'),
     url(r'^robot/(?P<robot_id>\d+)/daily/$', ShowTimeline.Daily, name='robot-daily'),
+
     # url(r'^$', Startseite.StelleDar, name='startseite'),
     # url(r'^hilfe/$', Hilfe.StelleDar, name='hilfe'),
     # url(r'^anmelden/$', auth_views.LoginView.as_view(template_name='Lori/auth_anmelden.html'), name='anmelden'),
