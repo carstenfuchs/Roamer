@@ -34,7 +34,7 @@ DATABASES = {
 }
 
 # LOGIN_URL = '/anmelden/'
-# LOGIN_REDIRECT_URL = '/'   # Ziel nach erfolgreichem Login, falls (mit "next") kein anderes Ziel angegeben wurde.
+LOGIN_REDIRECT_URL = '/'   # Ziel nach erfolgreichem Login, falls (mit "next") kein anderes Ziel angegeben wurde.
 
 # Make this unique, and don't share it with anybody.
 # For new secret keys, see `django/core/management/commands/startproject.py`:

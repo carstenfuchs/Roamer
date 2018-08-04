@@ -1,0 +1,24 @@
+{% extends "Basis.html" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block navbar-class %}container-fluid{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <h1>{{ title }}</h1>
+            <p>{% trans "Thanks for spending some quality time with the Web site today." %}</p>
+
+            <!-- von Louise Docker from Sydney, Australia - Wet Lorikeet, CC BY 2.0, https://commons.wikimedia.org/w/index.php?curid=3109054 -->
+            <!--
+            <img src="{% static 'common/images/Lorikeet_300px.png' %}"
+                 class="img-responsive img-circle center-block" style="margin-top: 140px; margin-bottom: 20px;"
+                 alt="A Rainbow Lorikeet (Trichoglossus haematodus) sitting on a fence after some rain in Sydney, Australia."> -->
+
+            <p class="text-center"><a href="{% url 'login' %}">{% trans 'Log in again' %}</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

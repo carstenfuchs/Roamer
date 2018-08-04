@@ -29,6 +29,9 @@ SECRET_KEY = localconfig.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = localconfig.DEBUG
 
+# LOGIN_URL          = localconfig.LOGIN_URL
+LOGIN_REDIRECT_URL = localconfig.LOGIN_REDIRECT_URL   # Ziel nach erfolgreichem Login, falls (mit "next") kein anderes Ziel angegeben wurde.
+
 ALLOWED_HOSTS = []
 
 
