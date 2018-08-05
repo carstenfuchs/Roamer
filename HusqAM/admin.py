@@ -11,7 +11,13 @@ class RobotAdmin(admin.ModelAdmin):
         return format_html('<a href="{}">daily</a>'.format(reverse("husqam:robot-daily", args=(robot.id,))))
     link_to_daily_page.short_description = "Activity"
 
-    list_display = ('owner', 'manufac_id', 'manufac_model', 'given_name', 'link_to_daily_page')
+    def private_sharing_link(self, robot):
+        if not robot.anon_id:
+            return ""
+        return format_html('<a href="{}">{}</a>'.format(reverse("husqam:robot-shared", args=(robot.anon_id,)), robot.anon_id))
+    private_sharing_link.short_description = "Private sharing"
+
+    list_display = ('owner', 'manufac_id', 'manufac_model', 'given_name', 'private_sharing_link', 'link_to_daily_page')
 
 admin.site.register(Robot, RobotAdmin)
 

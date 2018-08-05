@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^$', home.handle_request, name='home'),
     url(r'^load-json/$', LoadJSON.load_json, name='load-json'),
     url(r'^robot/(?P<robot_id>\d+)/daily/$', ShowTimeline.Daily, name='robot-daily'),
+    url(r'^robot/shared/(?P<anon_id>[\w\d]+)/$', ShowTimeline.SharedDaily, name='robot-shared'),
 
     # url(r'^$', Startseite.StelleDar, name='startseite'),
     # url(r'^hilfe/$', Hilfe.StelleDar, name='hilfe'),

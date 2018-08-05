@@ -87,6 +87,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
+            {% if user.is_authenticated and robot.anon_id %}<div class="pull-right"><a href="{% url 'husqam:robot-shared' robot.anon_id %}"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Private Sharing</a></div>{% endif %}
             <h1>Daily Activity <small>{{ robot }}</small></h1>
         </div>
     </div>

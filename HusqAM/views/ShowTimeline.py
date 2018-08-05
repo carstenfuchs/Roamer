@@ -40,9 +40,7 @@ class Day:
         self.spans = []
 
 
-@login_required
-def Daily(request, robot_id):
-    robot = get_object_or_404(Robot, id=robot_id)
+def show_daily(request, robot):
     all_states = robot.status_set.all()
 
     prev_tz = all_states[0].timestamp.tzinfo
@@ -96,3 +94,19 @@ def Daily(request, robot_id):
         'robot': robot,
         'days': days,
     })
+
+
+@login_required
+def Daily(request, robot_id):
+    robot = get_object_or_404(Robot, id=robot_id)
+
+    if not request.user.is_superuser and robot.owner != request.user:
+        # Should we rather raise Robot.DoesNotExist, that is, not reveal that the robot exists at all?
+        raise PermissionDenied("You are not registered as the owner of this robot.")
+
+    return show_daily(request, robot)
+
+
+def SharedDaily(request, anon_id):
+    robot = get_object_or_404(Robot, anon_id=anon_id)
+    return show_daily(request, robot)

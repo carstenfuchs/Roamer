@@ -43,6 +43,7 @@ class Robot(models.Model):
     manufac_id    = models.CharField(max_length=60, unique=True)
     manufac_model = models.CharField(max_length=60, blank=True)
     given_name    = models.CharField(max_length=80, blank=True)
+    anon_id       = models.CharField(max_length=10, null=True, blank=True, unique=True, default=None, help_text="The robot's ID that is used for sharing through a private link.")
 
     def update_from_dict(self, d):
         """

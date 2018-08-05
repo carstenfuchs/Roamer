@@ -1,4 +1,10 @@
+import string, random
 from HusqAM.models import Status
+
+
+def random_string():
+    # from https://stackoverflow.com/questions/2257441/random-string-generation-with-upper-case-letters-and-digits-in-python
+    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
 
 
 def process_pyhusmow_dict(robot, robot_dict):
