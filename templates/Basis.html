@@ -68,10 +68,21 @@
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             {% if user.is_staff %}
-                            <li><a href="{% url 'admin:index' %}">Admin Area</a></li>
+                                <li><a href="{% url 'admin:index' %}">Admin Area</a></li>
+                                <li class="divider"></li>
                             {% endif %}
+
+                            {% if user.robot_set.all %}
+                                <li class="dropdown-header">My Robots</li>
+                                {% for r in user.robot_set.all %}
+                                    <li><a href="{% url 'husqam:robot-daily' r.id %}">{{ r.given_name }}</a></li>
+                                {% endfor %}
+                                <li class="divider"></li>
+                            {% endif %}
+
+                            <li class="dropdown-header">Account</li>
                             {% if user.has_usable_password %}
-                            <li><a href="{% url 'password_change' %}">Change password</a></li>
+                                <li><a href="{% url 'password_change' %}">Change password</a></li>
                             {% endif %}
                             <li><a href="{% url 'logout' %}">Logout</a></li>
                         </ul>
