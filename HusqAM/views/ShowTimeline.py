@@ -41,7 +41,13 @@ class Day:
 
 
 def show_daily(request, robot):
-    all_states = robot.status_set.all()
+    all_states = list(robot.status_set.all())
+
+    all_states.append(Status(
+        robot=robot,
+        timestamp=timezone.now(),
+        mowerStatus="unknown"
+    ))
 
     prev_tz = all_states[0].timestamp.tzinfo
     this_ts = all_states[0].timestamp.astimezone(timezone.get_current_timezone())
@@ -70,25 +76,29 @@ def show_daily(request, robot):
 
         while duration_left:
             if duration_left <= day_left:
+                # The state ends still in this day.
                 day.spans.append(Span(duration_left, this_state))
                 day_left -= duration_left
 
                 duration_left = 0
             else:
+                # The state extends overnight, ending tomorrow.
                 day.spans.append(Span(day_left, this_state))
-                duration_left -= day_left
-
                 days.append(day)
+
+                duration_left -= day_left
                 day = Day(day.date_ + timedelta(days=1))
                 day_left = 1440
 
         # prepare the next iteration
         this_state = next_state
 
-    # add a final span to complete the last day
-    if day_left > 0:
-        day.spans.append(Span(day_left, this_state))
-        days.append(day)
+    # if day_left > 0:
+    #     # add a final span to complete the last day
+    #     day.spans.append(Span(day_left, this_state))
+
+    assert day.spans
+    days.append(day)
 
     return render(request, 'HusqAM/ShowTimelineDaily.html', {
         'robot': robot,
