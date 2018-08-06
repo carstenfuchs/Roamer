@@ -103,7 +103,7 @@
             </table>
 
             {% for day in days %}
-                <span class="text-muted" style="font-size: 84%;">{{ day.date_ }}</span>
+                <span class="text-muted" style="font-size: 84%; {% if day.date_.isoweekday == 7 %}color: #880000;{% endif %}">{{ day.date_|date:"D" }}</span><span class="text-muted" style="font-size: 84%;">, {{ day.date_ }}</span>
                 <div class="progress" style="margin-bottom: 3px; {# width: 1440px; #}">{# width ist hier, wenn 100% gewünscht sind, gar nicht notwendig! #}
                     {% for span in day.spans %}
                         <div class="progress-bar {{ span.get_css_class }}" role="progressbar"
