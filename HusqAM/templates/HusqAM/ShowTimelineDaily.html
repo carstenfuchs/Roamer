@@ -75,6 +75,22 @@
             border-left: 1px solid #999;
             padding-left: 4px;
         }
+
+        .dailyDate {
+            color: #666;
+            font-size: 84%;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        .dailyDate.weekday-6 {
+            background-color: #eee;
+        }
+
+        .dailyDate.weekday-7 {
+            background-color: #ddd;
+            color: #800;
+        }
     </style>
 {% endblock %}
 
@@ -131,7 +147,7 @@
             </table>
 
             {% for day in days %}
-                <span class="text-muted" style="font-size: 84%; {% if day.date_.isoweekday == 7 %}color: #880000;{% endif %}">{{ day.date_|date:"D" }}</span><span class="text-muted" style="font-size: 84%;">, {{ day.date_ }}</span>
+                <span class="dailyDate weekday-{{ day.date_.isoweekday }}">{{ day.date_|date:"D" }}, {{ day.date_ }}</span>
                 <div class="progress" style="margin-bottom: 3px; {# width: 1440px; #}">{# width ist hier, wenn 100% gewünscht sind, gar nicht notwendig! #}
                     {% for span in day.spans %}
                         <div class="progress-bar {{ span.get_css_class }}" role="progressbar"
