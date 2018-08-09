@@ -1,8 +1,27 @@
 from datetime import timedelta
+from django import forms
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from HusqAM.models import Robot, Status
+
+
+ZeitraumAuswahl = [
+    (1, "heute"),
+    (7, "eine Woche"),
+    (14, "zwei Wochen"),
+    (28, "vier Wochen"),
+    (90, "drei Monate"),
+    (365, "ein Jahr"),
+]
+
+
+class EinstellungenForm(forms.Form):
+    Zeitraum = forms.ChoiceField(choices=ZeitraumAuswahl,
+                                 widget=forms.Select(attrs={"size": "1", "onchange": "submit()", "class": "form-control input-sm"}))
+
+    Reihenfolge = forms.ChoiceField(choices=[("1", "heute zuerst"), ("2", "heute zuletzt")],
+                                    widget=forms.Select(attrs={"size": "1", "onchange": "submit()", "class": "form-control input-sm"}))
 
 
 class Span:
@@ -41,11 +60,18 @@ class Day:
 
 
 def show_daily(request, robot):
-    all_states = list(robot.status_set.all())
+    einst_form = EinstellungenForm(request.GET)
+
+    if not einst_form.is_valid():
+        einst_form = EinstellungenForm({'Zeitraum': 14, 'Reihenfolge': 1})
+        assert einst_form.is_valid()
+
+    now = timezone.now()
+    all_states = list(robot.status_set.filter(timestamp__gt=now - timedelta(days=int(einst_form.cleaned_data['Zeitraum']))))
 
     all_states.append(Status(
         robot=robot,
-        timestamp=timezone.now(),
+        timestamp=now,
         mowerStatus="unknown"
     ))
 
@@ -101,8 +127,9 @@ def show_daily(request, robot):
     days.append(day)
 
     return render(request, 'HusqAM/ShowTimelineDaily.html', {
+        'einst_form': einst_form,
         'robot': robot,
-        'days': days,
+        'days': days if einst_form.cleaned_data['Reihenfolge'] == "2" else reversed(days),
     })
 
 

@@ -89,6 +89,34 @@
         <div class="col-lg-12">
             {% if user.is_authenticated and robot.anon_id %}<div class="pull-right"><a href="{% url 'husqam:robot-shared' robot.anon_id %}"><span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Private Sharing</a></div>{% endif %}
             <h1>Daily Activity <small>{{ robot }}</small></h1>
+
+            <div class="well">
+                {% if einst_form.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        Beim Verarbeiten des Formulars sind Fehler aufgetreten.
+                        Beheben Sie die unten aufgeführten Probleme und senden Sie das Formular erneut.
+                    </div>
+                {% endif %}
+
+                <form method="get" class="form-inline">
+                    <div class="form-group{% if einst_form.Zeitraum.errors %} has-error{% endif %}">
+                        {{ einst_form.Zeitraum.label_tag }}
+                        {{ einst_form.Zeitraum }}
+                        {% for error in einst_form.Zeitraum.errors %}<p class="help-block"><strong>{{ error }}</strong></p>{% endfor %}
+                    </div>
+                    <div class="form-group{% if einst_form.Reihenfolge.errors %} has-error{% endif %}">
+                        {{ einst_form.Reihenfolge.label_tag }}
+                        {{ einst_form.Reihenfolge }}
+                        {% for error in einst_form.Reihenfolge.errors %}<p class="help-block"><strong>{{ error }}</strong></p>{% endfor %}
+                    </div>
+                </form>
+
+                {% for nf_error in einst_form.non_field_errors %}
+                    <div class="has-error">
+                        <p class="help-block"><strong>{{ nf_error }}</strong></p>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 
