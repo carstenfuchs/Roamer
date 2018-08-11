@@ -39,6 +39,16 @@ class StatusAdmin(admin.ModelAdmin):
         "valueFound",
     )
 
+    list_filter = (
+        "robot",
+        "connected",
+        "lastErrorCode",
+        "mowerStatus",
+        "nextStartSource",
+        "operatingMode",
+        "showAsDisconnected",
+    )
+
 admin.site.register(Status, StatusAdmin)
 
 
