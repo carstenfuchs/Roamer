@@ -60,7 +60,7 @@ class Robot(models.Model):
         return changed
 
     def __str__(self):
-        return "{} ({})".format(self.given_name or self.manufac_model or self.id, self.manufac_id)
+        return "{}".format(self.given_name or self.manufac_model or self.id)
 
 
 class Status(models.Model):

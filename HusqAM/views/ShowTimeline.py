@@ -10,6 +10,7 @@ ZeitraumAuswahl = [
     (1, "heute"),
     (7, "eine Woche"),
     (14, "zwei Wochen"),
+    (21, "drei Wochen"),
     (28, "vier Wochen"),
     (90, "drei Monate"),
     (365, "ein Jahr"),
@@ -63,7 +64,7 @@ def show_daily(request, robot):
     einst_form = EinstellungenForm(request.GET)
 
     if not einst_form.is_valid():
-        einst_form = EinstellungenForm({'Zeitraum': 14, 'Reihenfolge': 1})
+        einst_form = EinstellungenForm({'Zeitraum': 21, 'Reihenfolge': 2})
         assert einst_form.is_valid()
 
     now = timezone.now()
