@@ -1,2 +1,4 @@
-Django == 1.11
-pyhusmow == 0.2.0
+Django==4.0.3
+
+# This package is obsolete, see https://github.com/chrisz/pyhusmow for details.
+# pyhusmow==0.2.0

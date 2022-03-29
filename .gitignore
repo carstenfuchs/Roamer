@@ -1,4 +1,9 @@
+/activate
+/db.sqlite3
+/.hus_query_cache
+/Roamer/localconfig.py
+
 *.pyc
-.hus_query_cache
-db.sqlite3
-Roamer/localconfig.py
+
+# Sublime Text workspace settings
+*.sublime-workspace

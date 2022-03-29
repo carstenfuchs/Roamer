@@ -13,7 +13,7 @@ class HusAccount(models.Model):
     are paired with it, however note that one robot can be paired to multiple
     accounts: Querying two accounts can return updates about a common robot.
     """
-    user           = models.OneToOneField(User, primary_key=True)
+    user           = models.OneToOneField(User, primary_key=True, on_delete=models.CASCADE)
     hus_login      = models.CharField(max_length=60)
     hus_password   = models.CharField(max_length=60)
     token_id       = models.CharField(max_length=60, blank=True)
