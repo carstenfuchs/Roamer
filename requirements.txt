@@ -1,4 +1,5 @@
 Django==4.0.3
+requests==2.27.1
 
 # This package is obsolete, see https://github.com/chrisz/pyhusmow for details.
 # pyhusmow==0.2.0
